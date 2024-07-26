@@ -26,9 +26,9 @@ class ShiftResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('start_time')
+                Forms\Components\TimePicker::make('start_time')
                     ->required(),
-                Forms\Components\TextInput::make('end_time')
+                Forms\Components\TimePicker::make('end_time')
                     ->required(),
             ]);
     }
