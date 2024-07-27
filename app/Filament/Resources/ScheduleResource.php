@@ -2,15 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ScheduleResource\Pages;
-use App\Models\Schedule;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Schedule;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ScheduleResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 
 class ScheduleResource extends Resource
 {
@@ -37,6 +39,8 @@ class ScheduleResource extends Resource
                     Forms\Components\Select::make('office_id')
                         ->relationship('office', 'name')
                         ->required(),
+
+                    Forms\Components\Toggle::make('is_wfa')
                 ])
                 ->columns(1),
         ]);
@@ -44,11 +48,28 @@ class ScheduleResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table->columns([
+        return $table
+        ->modifyQueryUsing(function (Builder $query) {
+            $is_super_admin = Auth::user()->hasRole('super_admin');
+            if (!$is_super_admin) {
+                $query->where('user_id', Auth::user()->id);
+            }
+
+        })
+        ->columns([
             Tables\Columns\TextColumn::make('user.name')
+                ->label('Name')
+                ->searchable()
                 ->sortable(),
+            Tables\Columns\TextColumn::make('user.email')
+                ->label('Email')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\BooleanColumn::make('is_wfa')
+                ->label('WFA'),
 
             Tables\Columns\TextColumn::make('shift.name')
+                ->description(fn (Schedule $record): string => $record->shift->start_time . ' - ' . $record->shift->end_time)
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('office.name')
