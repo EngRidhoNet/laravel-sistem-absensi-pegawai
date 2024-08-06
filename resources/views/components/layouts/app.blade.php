@@ -11,6 +11,12 @@
         #map{
             height: 400px;
         }
+         .gradient-bg {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+        }
     </style>
 </head>
 <body>
